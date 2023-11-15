@@ -20,6 +20,16 @@ function createContactsService(){
         const [id] = await knex('contacts').insert(contact);
         return { id, ...contact};
     }
+    async function getAllPosts() {
+        try {
+            const posts = await knex.select('*').from('posts');
+            return posts;
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    }
+
     async function getManyContacts(query){
         const { name, favorite, page = 3, limit = 4 } = query;
         const paginator = new Paginator(page, limit);
@@ -67,6 +77,15 @@ function createContactsService(){
     async function deleteAllContacts(){
         return knex('contacts').del();
     }
+    async function getAllTags() {
+        try {
+            const tags = await knex.select('*').from('tags');
+            return tags;
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    }
     return {
         createContact,
         getManyContacts,
@@ -74,6 +93,8 @@ function createContactsService(){
         updateContact,
         deleteContact,
         deleteAllContacts,
+        getAllPosts,
+        getAllTags,
     };
 }
 module.exports = createContactsService;

@@ -1,5 +1,5 @@
 const express = require ('express')
-const contactController = require ('../controllers/contacts.controller');
+const contactController = require ('../controllers/posts.controller');
 const { methodNotAllowed } = require('../controllers/errors.controller');
 
 const router = express.Router();
@@ -9,6 +9,14 @@ router
     .get(contactController.getContactsByFilter)
     .post(contactController.createContact)
     .delete(contactController.deleteAllContacts)
+    .all(methodNotAllowed);
+router
+    .route('/blog')
+    .get(contactController.getAllPosts)
+    .all(methodNotAllowed);
+router
+    .route('/tagList')
+    .get(contactController.getAllTags)
     .all(methodNotAllowed);
 router
     .route('/:id')

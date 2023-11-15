@@ -1,8 +1,9 @@
-const makeContactsService = require ('../services/contacts.service');
+const makeContactsService = require ('../services/posts.service');
 const ApiError= require ('../api-error');
+
 async function createContact(req,res,next){
-    if (!req.body?.name){
-        return next(new ApiError(400, 'Name can not be empty'));
+    if (!req.body?.content){
+        return next(new ApiError(400, 'Post content can not be empty'));
     }
 
     try{
@@ -16,6 +17,34 @@ async function createContact(req,res,next){
             new ApiError(500, 'An error occurred while creating the contact')
         );
     }
+}
+
+async function getAllPosts(req,res,next){
+    let posts = [];
+    try {
+        const contactsService=makeContactsService();
+        posts= await contactsService.getAllPosts();
+    } catch (error){
+        console.log(error);
+        return next(
+            new ApiError(500, 'An error occurred while retrieving all posts')
+        );
+    }
+    return res.send(posts);
+}
+
+async function getAllTags(req,res,next){
+    let tags = [];
+    try {
+        const contactsService=makeContactsService();
+        tags= await contactsService.getAllTags();
+    } catch (error){
+        console.log(error);
+        return next(
+            new ApiError(500, 'An error occurred while retrieving all posts')
+        );
+    }
+    return res.send(tags);
 }
 
 async function getContactsByFilter(req,res,next){
@@ -112,4 +141,6 @@ module.exports = {
     createContact,
     updateContact,
     deleteContact,
+    getAllPosts,
+    getAllTags
 }
