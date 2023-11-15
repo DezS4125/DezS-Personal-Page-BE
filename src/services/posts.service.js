@@ -29,6 +29,16 @@ function createContactsService(){
             throw error;
         }
     }
+    async function getPostByTag(tagId) {
+        try {
+            const posts = await knex.select('*').from('posts').where('tag_id', '=', tagId);
+            return posts;
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    }
+
 
     async function getManyContacts(query){
         const { name, favorite, page = 3, limit = 4 } = query;
@@ -95,6 +105,7 @@ function createContactsService(){
         deleteAllContacts,
         getAllPosts,
         getAllTags,
+        getPostByTag
     };
 }
 module.exports = createContactsService;

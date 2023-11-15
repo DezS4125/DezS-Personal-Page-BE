@@ -47,6 +47,42 @@ async function getAllTags(req,res,next){
     return res.send(tags);
 }
 
+//work here please
+async function getPostsByTag(req,res,next){
+    let posts = [];
+    try {
+        const contactsService=makeContactsService();
+        posts= await contactsService.getPostByTag(req.params.tag);
+    } catch (error){
+        console.log(error);
+        return next(
+            new ApiError(500, 'An error occurred while retrieving all posts')
+        );
+    }
+    return res.send(posts);
+}
+
+// async function getContact(req,res,next){
+//     try {
+//         const contactsService = makeContactsService();
+//         const contact = await contactsService.getContactById(req.params.id);
+//         if (!contact){
+//             return next(new ApiError(404, 'Contact not found'));
+//         }
+//         return res.send(contact);
+//     } catch (error){
+//         console.log(error);
+//         return next(
+//             new ApiError(
+//                 500,
+//                 `Error retrieving contact with id=${req.params.id}`
+//             )
+//         )
+//     }
+// }
+
+
+
 async function getContactsByFilter(req,res,next){
     let contacts = [];
     try {
@@ -142,5 +178,6 @@ module.exports = {
     updateContact,
     deleteContact,
     getAllPosts,
-    getAllTags
+    getAllTags,
+    getPostsByTag
 }

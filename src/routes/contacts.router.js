@@ -15,6 +15,10 @@ router
     .get(contactController.getAllPosts)
     .all(methodNotAllowed);
 router
+    .route('/blog/t/:tag')
+    .get(contactController.getPostsByTag)
+    .all(methodNotAllowed);
+router
     .route('/tagList')
     .get(contactController.getAllTags)
     .all(methodNotAllowed);
