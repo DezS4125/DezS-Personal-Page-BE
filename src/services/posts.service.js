@@ -1,28 +1,12 @@
 const knex = require('../database/knex');
-const Paginator = require('./paginator')
 
 function createContactsService(){
-    function readContact(payload){
-        const contact = {
-            name: payload.name,
-            email: payload.email,
-            address: payload.address,
-            phone: payload.phone,
-            favorite: payload.favorite,
-        };
-        Object.keys(contact).forEach(
-            (key) => contact[key] === undefined && delete contact[key]
-        );
-        return contact;
-    }
-    async function createContact(payload){
-        const contact = readContact(payload);
-        const [id] = await knex('contacts').insert(contact);
-        return { id, ...contact};
-    }
     async function getAllPosts() {
         try {
-            const posts = await knex.select('*').from('posts');
+            const posts = await knex.select('post_id', 'post_title', 'post_content', 'upvote', 'posts.tag_id', 'tag_name')
+                .from('posts')
+                .join('tags', 'posts.tag_id', '=', 'tags.tag_id')
+                .orderBy('post_id')
             return posts;
         } catch (error) {
             console.error(error);
@@ -31,7 +15,11 @@ function createContactsService(){
     }
     async function getPostByTag(tagId) {
         try {
-            const posts = await knex.select('*').from('posts').where('tag_id', '=', tagId);
+            const posts = await knex.select('post_id', 'post_title', 'post_content', 'upvote', 'posts.tag_id', 'tag_name')
+                .from('posts')
+                .join('tags', 'posts.tag_id', '=', 'tags.tag_id')
+                .orderBy('post_id')
+                .where('posts.tag_id', '=', tagId);
             return posts;
         } catch (error) {
             console.error(error);
@@ -40,53 +28,6 @@ function createContactsService(){
     }
 
 
-    async function getManyContacts(query){
-        const { name, favorite, page = 3, limit = 4 } = query;
-        const paginator = new Paginator(page, limit);
-        let results = await knex('contacts')
-            .where((builder) => {
-                if (name) {
-                    builder.where('name', 'like', `%${name}%`);
-                }
-                if (favorite !== undefined) {
-                    builder.where('favorite', 1);
-                }
-            })
-            .select(
-                knex.raw('count(id) OVER() AS recordsCount'),
-                'id',
-                'name',
-                'email',
-                'address',
-                'phone',
-                'favorite'
-            )
-            .limit(paginator.limit)
-            .offset(paginator.offset);
-        let totalRecords = 0;
-        results = results.map((result) => {
-            totalRecords = result.recordsCount;
-            delete result.recordsCount;
-            return result;
-        });
-        return {
-            metadata: paginator.getMetadata(totalRecords),
-            contacts: results,
-        };
-    }
-    async function getContactById(id){
-        return knex('contacts').where('id',id).select('*').first();
-    }
-    async function updateContact(id,payload){
-        const update = readContact(payload);
-        return knex('contacts').where('id',id).update(update);
-    }
-    async function deleteContact(id){
-        return knex('contacts').where('id',id).del();
-    }
-    async function deleteAllContacts(){
-        return knex('contacts').del();
-    }
     async function getAllTags() {
         try {
             const tags = await knex.select('*').from('tags');
@@ -96,16 +37,49 @@ function createContactsService(){
             throw error;
         }
     }
+    async function searchPost(searchString) {
+        try {
+            let query1 = knex('posts').where('post_title', 'like', `%${searchString}%`).select();
+            let query2 = knex('posts').where('post_content', 'like', `%${searchString}%`).select();
+            let posts = await knex.union([query1, query2])
+            console.log(posts);
+            return posts;
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    }
+    async function upvote(postId){
+        try {
+            knex('posts')
+                .where('post_id', postId)
+                .increment('upvote', 1)
+                .then(() => console.log(`Upvoted post ${postId}`))
+                .catch((error) => console.error(`Error upvoting post ${postId}:`, error));
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    }
+    async function downvote(postId){
+        try {
+            knex('posts')
+                .where('post_id', postId)
+                .increment('upvote', -1)
+                .then(() => console.log(`Downvoted post ${postId}`))
+                .catch((error) => console.error(`Error upvoting post ${postId}:`, error));
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    }
     return {
-        createContact,
-        getManyContacts,
-        getContactById,
-        updateContact,
-        deleteContact,
-        deleteAllContacts,
         getAllPosts,
         getAllTags,
-        getPostByTag
+        getPostByTag,
+        searchPost,
+        upvote,
+        downvote
     };
 }
 module.exports = createContactsService;

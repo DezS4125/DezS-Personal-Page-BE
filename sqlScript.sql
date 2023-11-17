@@ -44,3 +44,13 @@ INSERT INTO tags (tag_name) VALUES
 
 select * from tags;
 select * from posts;
+select post_id, post_title, post_content, upvote, posts.tag_id, tag_name from posts 
+	join tags
+	on posts.tag_id = tags.tag_id
+    order by post_id;
+    
+select * from posts where post_title like concat('%','similique','%')
+union (select * from posts where post_content like concat('%','similique','%'));
+UPDATE posts
+SET upvote = upvote + 1
+WHERE post_id = 1;

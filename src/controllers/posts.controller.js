@@ -41,7 +41,7 @@ async function getAllTags(req,res,next){
     } catch (error){
         console.log(error);
         return next(
-            new ApiError(500, 'An error occurred while retrieving all posts')
+            new ApiError(500, 'An error occurred while retrieving all tags')
         );
     }
     return res.send(tags);
@@ -56,12 +56,49 @@ async function getPostsByTag(req,res,next){
     } catch (error){
         console.log(error);
         return next(
-            new ApiError(500, 'An error occurred while retrieving all posts')
+            new ApiError(500, 'An error occurred while retrieving posts by tag')
         );
     }
     return res.send(posts);
 }
 
+async function searchPost(req,res,next){
+    let posts = [];
+    try {
+        const contactsService=makeContactsService();
+        posts= await contactsService.searchPost(req.params.searchString);
+    } catch (error){
+        console.log(error);
+        return next(
+            new ApiError(500, 'An error occurred while searching for post')
+        );
+    }
+    return res.send(posts);
+}
+async function upvote(req,res,next){
+    try {
+        const contactsService=makeContactsService();
+        await contactsService.upvote(req.params.postId);
+    } catch (error){
+        console.log(error);
+        return next(
+            new ApiError(500, 'An error occurred while upvoting')
+        );
+    }
+    return res.send("Upvote successfully");
+}
+async function downvote(req,res,next){
+    try {
+        const contactsService=makeContactsService();
+        await contactsService.downvote(req.params.postId);
+    } catch (error){
+        console.log(error);
+        return next(
+            new ApiError(500, 'An error occurred while downvoting')
+        );
+    }
+    return res.send("Downvote successfully");
+}
 // async function getContact(req,res,next){
 //     try {
 //         const contactsService = makeContactsService();
@@ -177,7 +214,10 @@ module.exports = {
     // createContact,
     // updateContact,
     // deleteContact,
+    searchPost,
     getAllPosts,
     getAllTags,
-    getPostsByTag
+    getPostsByTag,
+    upvote,
+    downvote,
 }
