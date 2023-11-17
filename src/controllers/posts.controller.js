@@ -99,6 +99,23 @@ async function downvote(req,res,next){
     }
     return res.send("Downvote successfully");
 }
+async function createNewPost(req,res,next){
+    if (!req.body?.post_title){
+        return next(new ApiError(400, 'Post title can not be empty'));
+    }
+
+    try{
+        const contactsService = makeContactsService();
+        const post = await contactsService.createNewPost(req.body)
+        return res.send(post);
+    } 
+    catch (error){
+        console.log(error);
+        return next(
+            new ApiError(500, 'An error occurred while creating the post')
+        );
+    }
+}
 // async function getContact(req,res,next){
 //     try {
 //         const contactsService = makeContactsService();
@@ -220,4 +237,5 @@ module.exports = {
     getPostsByTag,
     upvote,
     downvote,
+    createNewPost
 }

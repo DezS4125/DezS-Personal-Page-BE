@@ -13,6 +13,7 @@ const router = express.Router();
 router
     .route('/blog')
     .get(contactController.getAllPosts)
+    .post(contactController.createNewPost)
     .all(methodNotAllowed);
 router
     .route('/blog/:searchString')

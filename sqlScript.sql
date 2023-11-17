@@ -54,3 +54,5 @@ union (select * from posts where post_content like concat('%','similique','%'));
 UPDATE posts
 SET upvote = upvote + 1
 WHERE post_id = 1;
+INSERT INTO `posts` (`post_title`, `post_content`, `upvote`, `tag_id`)
+VALUES ('testtitle', 'test content', 2, 3);

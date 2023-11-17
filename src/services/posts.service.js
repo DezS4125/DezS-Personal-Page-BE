@@ -73,13 +73,31 @@ function createContactsService(){
             throw error;
         }
     }
+    function readPost(payload){
+        const post = {
+            post_title: payload.post_title,
+            post_content: payload.post_content,
+            upvote: 0,
+            tag_id: payload.tag_id,
+        };
+        Object.keys(post).forEach(
+            (key) => post[key] === undefined && delete post[key]
+        );
+        return post;
+    }
+    async function createNewPost(payload){
+        const post = readPost(payload);
+        const [post_id] = await knex('posts').insert(post);
+        return { post_id, ...post};
+    }
     return {
         getAllPosts,
         getAllTags,
         getPostByTag,
         searchPost,
         upvote,
-        downvote
+        downvote,
+        createNewPost
     };
 }
 module.exports = createContactsService;
